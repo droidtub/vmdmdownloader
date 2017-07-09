@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Down Tube</string>
+    <string name="loading_splash">Loading</string>
+    <string name="vimeo_activity_name">Vimeo</string>
+</resources>
