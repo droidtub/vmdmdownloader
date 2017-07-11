@@ -7,6 +7,7 @@ import com.musicdownloader.vimeodailymotiondownloader.VideoApplication;
 import com.musicdownloader.vimeodailymotiondownloader.di.component.ActivityComponent;
 import com.musicdownloader.vimeodailymotiondownloader.di.component.AppComponent;
 import com.musicdownloader.vimeodailymotiondownloader.di.component.DaggerActivityComponent;
+import com.musicdownloader.vimeodailymotiondownloader.di.module.ActivityModule;
 
 /**
  * Created by Hanh Nguyen on 7/7/2017.
@@ -29,6 +30,7 @@ public class BaseActivity extends AppCompatActivity {
     public void initActivityComponent(){
         activityComponent = DaggerActivityComponent.builder()
                             .appComponent(getAppComponent())
+                            .activityModule(new ActivityModule(this))
                             .build();
     }
 

@@ -3,9 +3,11 @@ package com.musicdownloader.vimeodailymotiondownloader.view.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -22,6 +24,10 @@ import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntity;
 import com.musicdownloader.vimeodailymotiondownloader.presenter.VimeoPresenter;
 import com.musicdownloader.vimeodailymotiondownloader.view.VimeoView;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,10 +104,55 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
         intent.putParcelableArrayListExtra("video_list", list);
         startActivity(intent);
     }
+    private class GetHTML extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            String s = getHtmlText(params[0]);
+            return s;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d("han.hanh", s);
+        }
+    }
+
+    private String getHtmlText(String currentUrl){
+        Document doc;
+        String jsonString = "";
+        try{
+            doc = Jsoup.connect(currentUrl).get();
+            String body = doc.getElementsByTag("script").text();
+            Log.d("han.hanh", body);
+            String startString = "\"progressive\":";
+            String endString = "},\"lang\"";
+            //int start = body.indexOf("\"progressive\":");
+            //int end = body.indexOf("},\"lang\"");
+            int start = body.indexOf(startString);
+            Log.d("han.hanh", start + "");
+            int end = body.indexOf(endString);
+            Log.d("han.hanh", end + "");
+            jsonString = body.substring(start + startString.length() - 1, end);
+            //jsonString = body.substring(start + 12, end);
+            Log.d("han.hanh",jsonString);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jsonString;
+    }
 
     @OnClick(R.id.btn_download)
     public void injectJS(){
-        vimeoPresenter.injectJS(webView, "js/getVimeoVideo.js");
+        Log.d("han.hanh", webView.getUrl().substring(18));
+        String currentUrl = "https://player.vimeo.com/video/" + webView.getUrl().substring(18);
+        Log.d("han.hanh", currentUrl);
+
+
+        new GetHTML().execute(currentUrl);
+        //vimeoPresenter.injectJS(webView, "js/extractVideoUrls.js");
     }
 
     public class WebAppInterface{
