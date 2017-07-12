@@ -19,8 +19,11 @@ import android.widget.FrameLayout;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.musicdownloader.vimeodailymotiondownloader.R;
 import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntity;
+import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntityJson;
 import com.musicdownloader.vimeodailymotiondownloader.presenter.VimeoPresenter;
 import com.musicdownloader.vimeodailymotiondownloader.view.VimeoView;
 
@@ -28,8 +31,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -51,6 +57,7 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
     @Inject SharedPreferences sharedPreferences;
     @Inject VimeoPresenter vimeoPresenter;
     private String vimeoUrl = "https://vimeo.com";
+    private List<VideoEntityJson> videoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -104,44 +111,39 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
         intent.putParcelableArrayListExtra("video_list", list);
         startActivity(intent);
     }
-    private class GetHTML extends AsyncTask<String, Void, String> {
+
+    private class GetHTML extends AsyncTask<String, Void, List<VideoEntityJson>> {
         @Override
-        protected String doInBackground(String... params) {
-            String s = getHtmlText(params[0]);
-            return s;
+        protected List<VideoEntityJson> doInBackground(String... params) {
+            return getHtmlText(params[0]);
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            Log.d("han.hanh", s);
+        protected void onPostExecute(List<VideoEntityJson> list) {
+            super.onPostExecute(list);
+            videoList = list;
         }
     }
 
-    private String getHtmlText(String currentUrl){
+    private List<VideoEntityJson> getHtmlText(String currentUrl){
         Document doc;
-        String jsonString = "";
+        List<VideoEntityJson> videoList = new ArrayList<>();
+
         try{
             doc = Jsoup.connect(currentUrl).get();
-            String body = doc.getElementsByTag("script").text();
-            Log.d("han.hanh", body);
-            String startString = "\"progressive\":";
-            String endString = "},\"lang\"";
-            //int start = body.indexOf("\"progressive\":");
-            //int end = body.indexOf("},\"lang\"");
-            int start = body.indexOf(startString);
-            Log.d("han.hanh", start + "");
-            int end = body.indexOf(endString);
-            Log.d("han.hanh", end + "");
-            jsonString = body.substring(start + startString.length() - 1, end);
-            //jsonString = body.substring(start + 12, end);
-            Log.d("han.hanh",jsonString);
+            String bodyContent = doc.body().toString();
 
+            String regexStr = "\"progressive\":(.*)\\}\\,\\\"lang\\\"";
+            Matcher m = Pattern.compile(regexStr).matcher(bodyContent);
+            Log.d("han.hanh", m.group(1));
+            Gson gson = new Gson();
+            Type videoEntityJsonType = new TypeToken<ArrayList<VideoEntityJson>>(){}.getType();
+            videoList = gson.fromJson(m.group(1), videoEntityJsonType);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return jsonString;
+        return videoList;
     }
 
     @OnClick(R.id.btn_download)
@@ -150,9 +152,14 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
         String currentUrl = "https://player.vimeo.com/video/" + webView.getUrl().substring(18);
         Log.d("han.hanh", currentUrl);
 
-
-        new GetHTML().execute(currentUrl);
+        //new GetHTML().execute(currentUrl);
         //vimeoPresenter.injectJS(webView, "js/extractVideoUrls.js");
+        vimeoPresenter.getVideoList(currentUrl);
+    }
+
+    @Override
+    public void setVideoList(List<VideoEntityJson> list) {
+
     }
 
     public class WebAppInterface{

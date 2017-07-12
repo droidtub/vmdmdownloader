@@ -5,14 +5,21 @@ import android.util.Base64;
 import android.webkit.WebView;
 
 import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntity;
+import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntityJson;
+import com.musicdownloader.vimeodailymotiondownloader.model.DownloadModel;
 import com.musicdownloader.vimeodailymotiondownloader.view.VimeoView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 import javax.inject.Inject;
+
+import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Hanh Nguyen on 7/9/2017.
@@ -23,6 +30,7 @@ public class VimeoPresenter {
     private VimeoView vimeoView;
     private ArrayList<VideoEntity> listVideo;
     private Context context;
+    @Inject DownloadModel downloadModel;
 
     @Inject
     public VimeoPresenter(Context context){
@@ -64,5 +72,29 @@ public class VimeoPresenter {
 
     public void startVimeoVideoActivity(){
         vimeoView.startVimeoVideoActivity(listVideo);
+    }
+
+    public void getVideoList(String url){
+        downloadModel.getVideoList(url).subscribe(new Observer<List<VideoEntityJson>>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(@NonNull List<VideoEntityJson> videoEntityJsons) {
+                vimeoView.setVideoList(videoEntityJsons);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
     }
 }
