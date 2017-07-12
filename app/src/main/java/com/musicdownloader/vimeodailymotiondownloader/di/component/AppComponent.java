@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.musicdownloader.vimeodailymotiondownloader.di.module.AppModule;
+import com.musicdownloader.vimeodailymotiondownloader.model.DatabaseModel;
 
 import javax.inject.Singleton;
 
@@ -23,4 +24,5 @@ public interface AppComponent {
     OkHttpClient okHttpClient();
     Retrofit retrofit();
     SharedPreferences sharedPreferences();
+    DatabaseModel databaseModel();
 }

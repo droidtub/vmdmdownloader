@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.musicdownloader.vimeodailymotiondownloader.VideoApplication;
+import com.musicdownloader.vimeodailymotiondownloader.model.DatabaseModel;
 import com.musicdownloader.vimeodailymotiondownloader.model.UpdateModel;
 
 import java.util.concurrent.TimeUnit;
@@ -25,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Module
 public class AppModule {
 
-    private VideoApplication application;
+    private static VideoApplication application;
 
     public AppModule(VideoApplication application){
         this.application = application;
@@ -68,4 +69,9 @@ public class AppModule {
         return PreferenceManager.getDefaultSharedPreferences(application);
     }
 
+    @Provides
+    @Singleton
+    public DatabaseModel provideDatabaseModel(){
+        return DatabaseModel.getInstance(application);
+    }
 }

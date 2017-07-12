@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 25
@@ -55,6 +56,8 @@ dependencies {
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
     //gson
     compile 'com.google.code.gson:gson:2.8.0'
+    //Greendao
+    compile 'org.greenrobot:greendao:3.2.2'
     //EditText
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
     //afollestad dialog

@@ -97,4 +97,8 @@ public class VimeoPresenter {
             }
         });
     }
+
+    public void downloadVideo(String url, String name){
+        downloadModel.downloadVideo(url, name);
+    }
 }

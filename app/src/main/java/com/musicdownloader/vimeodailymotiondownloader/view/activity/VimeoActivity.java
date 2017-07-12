@@ -15,7 +15,9 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -33,6 +35,7 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,7 +104,6 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.addJavascriptInterface(new WebAppInterface(), "Android");
         webView.loadUrl(vimeoUrl);
     }
 
@@ -112,73 +114,44 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
         startActivity(intent);
     }
 
-    private class GetHTML extends AsyncTask<String, Void, List<VideoEntityJson>> {
-        @Override
-        protected List<VideoEntityJson> doInBackground(String... params) {
-            return getHtmlText(params[0]);
-        }
-
-        @Override
-        protected void onPostExecute(List<VideoEntityJson> list) {
-            super.onPostExecute(list);
-            videoList = list;
-        }
-    }
-
-    private List<VideoEntityJson> getHtmlText(String currentUrl){
-        Document doc;
-        List<VideoEntityJson> videoList = new ArrayList<>();
-
-        try{
-            doc = Jsoup.connect(currentUrl).get();
-            String bodyContent = doc.body().toString();
-
-            String regexStr = "\"progressive\":(.*)\\}\\,\\\"lang\\\"";
-            Matcher m = Pattern.compile(regexStr).matcher(bodyContent);
-            Log.d("han.hanh", m.group(1));
-            Gson gson = new Gson();
-            Type videoEntityJsonType = new TypeToken<ArrayList<VideoEntityJson>>(){}.getType();
-            videoList = gson.fromJson(m.group(1), videoEntityJsonType);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return videoList;
-    }
-
     @OnClick(R.id.btn_download)
-    public void injectJS(){
-        Log.d("han.hanh", webView.getUrl().substring(18));
-        String currentUrl = "https://player.vimeo.com/video/" + webView.getUrl().substring(18);
-        Log.d("han.hanh", currentUrl);
-
-        //new GetHTML().execute(currentUrl);
-        //vimeoPresenter.injectJS(webView, "js/extractVideoUrls.js");
-        vimeoPresenter.getVideoList(currentUrl);
+    public void getVideoList(){
+        if(webView.getUrl().substring(18) != null && !webView.getUrl().substring(18).isEmpty()) {
+            String currentUrl = "https://player.vimeo.com/video/" + webView.getUrl().substring(18);
+            Toast.makeText(this, "Loading...", Toast.LENGTH_SHORT).show();
+            vimeoPresenter.getVideoList(currentUrl);
+        } else {
+            Toast.makeText(this, "Invalid url!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
-    public void setVideoList(List<VideoEntityJson> list) {
+    public void setVideoList(final List<VideoEntityJson> list) {
+        final String[] qualityList = new String[list.size()];
+        for(int i = 0; i < list.size(); i++) {
+            VideoEntityJson item = list.get(i);
+            String qualityItem = item.quality;
+            qualityList[i] = qualityItem;
+        }
 
+        new MaterialDialog.Builder(this)
+                .title(sharedPreferences.getString(getString(R.string.video_title_key), ""))
+                .items(qualityList)
+                .itemsCallbackSingleChoice(-1, new MaterialDialog.ListCallbackSingleChoice() {
+                    @Override
+                    public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                        String selectedVd = Arrays.asList(qualityList).get(which);
+                        for(VideoEntityJson item : list){
+                            if(selectedVd.equals(item.quality)){
+                                vimeoPresenter.downloadVideo(item.url, sharedPreferences.getString(getString(R.string.video_title_key), "") + ".mp4");
+                            }
+                        }
+                        return true;
+                    }
+                })
+                .positiveText(R.string.download_action)
+                .negativeText(R.string.cancel_action)
+                .show();
     }
 
-    public class WebAppInterface{
-        WebAppInterface(){
-        }
-
-        @JavascriptInterface
-        public void addVideo(String videoUrl, String thumbnailUrl, String title){
-            vimeoPresenter.addVideo(new VideoEntity(videoUrl, thumbnailUrl, title));
-        }
-
-        @JavascriptInterface
-        public void showVimeoVideoActivity(){
-            vimeoPresenter.startVimeoVideoActivity();
-        }
-
-        @JavascriptInterface
-        public void showVimeoNoVideoDialog(){
-
-        }
-    }
 }
