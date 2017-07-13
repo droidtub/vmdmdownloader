@@ -48,4 +48,8 @@ public class DatabaseModel {
     public List<DownloadMissionItem> readDownloadItemList(int result) {
         return DownloadMissionItem.readDownloadItemList(openHelper.getReadableDatabase(), result);
     }
+
+    public void removeDownloadItem(long missionId){
+        DownloadMissionItem.deleteDownloadItem(openHelper.getWritableDatabase(), missionId);
+    }
 }

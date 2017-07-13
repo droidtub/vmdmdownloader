@@ -63,4 +63,5 @@ public class VimeoVideoActivity extends BaseActivity implements VimeoVideoView{
     public void loadPhoto(ImageView view, String url) {
         vimeoVideoPresenter.loadPhoto(view, url);
     }
+
 }

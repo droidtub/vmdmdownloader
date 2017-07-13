@@ -18,10 +18,12 @@ import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.musicdownloader.vimeodailymotiondownloader.R;
+import com.musicdownloader.vimeodailymotiondownloader.entity.DownloadMission;
 import com.musicdownloader.vimeodailymotiondownloader.entity.DownloadMissionItem;
 import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntity;
 import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntityJson;
 
+import org.greenrobot.greendao.annotation.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -54,7 +56,7 @@ public class DownloadModel {
     public @interface DownloadResultRule {}
 
     public static String DOWNLOAD_PATH = "/Download/DownTubeVideos/";
-    private DownloadManager downloadManager;
+    public DownloadManager downloadManager;
     private long downloadId;
     private Context context;
 
@@ -144,6 +146,12 @@ public class DownloadModel {
         }
     }
 
+    private float getMissionProcess(@NotNull Cursor cursor) {
+        long soFar = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+        long total = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+        return (int) (100.0 * soFar / total);
+    }
+
     private int getDownloadResult(Cursor cursor){
         switch (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
             case DownloadManager.STATUS_SUCCESSFUL:
@@ -167,7 +175,28 @@ public class DownloadModel {
     }
 
     public static void updateMissionResult(Context context, Long missionId, int result){
+        DownloadMissionItem entity = DatabaseModel.getInstance(context).readDownloadItem(missionId);
+        if (entity != null) {
+            entity.result = result;
+            DatabaseModel.getInstance(context).updateDownloadEntity(entity);
+        }
+    }
 
+    @Nullable
+    public DownloadMission getDownloadMission(Context context, long id) {
+        DownloadMissionItem entity = DatabaseModel.getInstance(context).readDownloadItem(id);
+        if (entity == null) {
+            return null;
+        } else {
+            Cursor cursor = getMissionCursor(id);
+            float process = 0;
+            if (cursor != null) {
+                entity.result = getDownloadResult(cursor);
+                process = getMissionProcess(cursor);
+                cursor.close();
+            }
+            return new DownloadMission(entity, process);
+        }
     }
 
     public void loadPhoto(ImageView imageView, String thumbnailUrl){
@@ -188,6 +217,22 @@ public class DownloadModel {
                 });
 
         builder.into(imageView);
+    }
+
+
+    public static void loadIcon(Context context, ImageView view,
+                                int resId) {
+        DrawableRequestBuilder<Integer> builder = Glide
+                .with(context)
+                .load(resId)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE);
+
+
+        builder.into(view);
+    }
+
+    public static void releaseImageView(ImageView view) {
+        Glide.clear(view);
     }
 
     public Observable<List<VideoEntityJson>> getVideoList(final String url){

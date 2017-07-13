@@ -29,4 +29,11 @@
         <activity android:name=".view.activity.DailyMotionActivity"/>
     </application>
 
+    <receiver
+        android:name=".common.util.DownloadReceiver">
+        <intent-filter android:priority="1000">
+            <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+        </intent-filter>
+    </receiver>
+
 </manifest>

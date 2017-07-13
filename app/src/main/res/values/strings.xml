@@ -6,4 +6,6 @@
     <string name="video_title_key">Video Title</string>
     <string name="download_action">Download</string>
     <string name="cancel_action">Cancel</string>
+
+    <string name="play_video">Play</string>
 </resources>
