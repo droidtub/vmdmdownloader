@@ -143,7 +143,7 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
                         String selectedVd = Arrays.asList(qualityList).get(which);
                         for(VideoEntityJson item : list){
                             if(selectedVd.equals(item.quality)){
-                                vimeoPresenter.downloadVideo(item.url, sharedPreferences.getString(getString(R.string.video_title_key), "") + ".mp4");
+                                vimeoPresenter.downloadVideo(item.url, sharedPreferences.getString(getString(R.string.video_title_key), "") + ".mp4", sharedPreferences.getString(getString(R.string.video_thumbnail_key), ""));
                             }
                         }
                         return true;

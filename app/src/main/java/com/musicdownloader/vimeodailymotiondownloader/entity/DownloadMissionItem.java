@@ -22,22 +22,24 @@ public class DownloadMissionItem {
 
     public String url;
     public String name;
+    public String thumbnail;
 
     @DownloadModel.DownloadResultRule
     public int result;
 
-    public DownloadMissionItem(long missionId, String name, String url){
+    public DownloadMissionItem(long missionId, String name, String url, String thumbnail){
         this.missionId = missionId;
         this.name = name;
         this.url = url;
+        this.thumbnail = thumbnail;
     }
 
-    @Generated(hash = 762817326)
-    public DownloadMissionItem(long missionId, String url, String name,
-            int result) {
+    @Generated(hash = 967999975)
+    public DownloadMissionItem(long missionId, String url, String name, String thumbnail, int result) {
         this.missionId = missionId;
         this.url = url;
         this.name = name;
+        this.thumbnail = thumbnail;
         this.result = result;
     }
 
@@ -128,5 +130,13 @@ public class DownloadMissionItem {
 
     public void setResult(int result) {
         this.result = result;
+    }
+
+    public String getThumbnail() {
+        return this.thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

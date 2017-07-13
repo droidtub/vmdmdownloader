@@ -81,13 +81,13 @@ public class DownloadModel {
         databaseModel = DatabaseModel.getInstance(context);
     }
 
-    public void downloadVideo(String url, String name){
+    public void downloadVideo(String url, String name, String thumbnail){
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.allowScanningByMediaScanner();
         request.setDestinationInExternalPublicDir(DOWNLOAD_PATH, name);
         downloadId = downloadManager.enqueue(request);
 
-        DownloadMissionItem missionItem = new DownloadMissionItem(downloadId, name, url);
+        DownloadMissionItem missionItem = new DownloadMissionItem(downloadId, name, url, thumbnail);
         missionItem.result = RESULT_DOWNLOADING;
 
         databaseModel.writeDownloadItem(missionItem);
@@ -248,13 +248,16 @@ public class DownloadModel {
 
                     String regexUrl = "\"progressive\":(.*)\\}\\,\\\"lang\\\"";
                     String regexTitle = "\\\"title\\\"\\:\\\"(.*?)\\\"\\,";
+                    String regexThumbnail = "\\\"base\\\"\\:\\\"(.*?)\\}";
                     Matcher matcherUrl = Pattern.compile(regexUrl).matcher(bodyContent);
                     Matcher matcherTitle = Pattern.compile(regexTitle).matcher(bodyContent);
-                    if(matcherUrl.find() && matcherTitle.find()) {
+                    Matcher matcherThumbnail = Pattern.compile(regexThumbnail).matcher(bodyContent);
+                    if(matcherUrl.find() && matcherTitle.find() && matcherThumbnail.find()) {
                         Gson gson = new Gson();
                         Type videoEntityJsonType = new TypeToken<ArrayList<VideoEntityJson>>(){}.getType();
                         videoList = gson.fromJson(matcherUrl.group(1), videoEntityJsonType);
                         sharedPreferences.edit().putString(context.getString(R.string.video_title_key), matcherTitle.group(1)).apply();
+                        sharedPreferences.edit().putString(context.getString(R.string.video_thumbnail_key), matcherThumbnail.group(1)).apply();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

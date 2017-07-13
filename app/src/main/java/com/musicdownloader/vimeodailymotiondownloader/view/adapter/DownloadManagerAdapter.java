@@ -99,7 +99,7 @@ public class DownloadManagerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
 
         public void onBindView(int position){
-            mainView.loadBackgroundImage(backgroundImage, downloadMissionList.get(position).entity.url);
+            mainView.loadBackgroundImage(backgroundImage, downloadMissionList.get(position).entity.thumbnail);
             switch (downloadMissionList.get(position).entity.result) {
                 case DownloadModel.RESULT_DOWNLOADING:
                     progressIcon.forceSetProgressState();

@@ -9,7 +9,6 @@
     android:layout_marginRight="8dp"
     android:layout_marginBottom="8dp"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/colorPrimaryDark"
     app:cardCornerRadius="2dp"
     app:cardPreventCornerOverlap="true"
     tools:ignore="UnusedAttribute">
@@ -61,7 +60,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="8dp"
-            android:background="@color/colorPrimaryDark"/>
+            android:background="@android:color/transparent"/>
     </RelativeLayout>
 
 

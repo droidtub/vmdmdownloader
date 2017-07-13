@@ -4,6 +4,7 @@
     <string name="vimeo_activity_name">Vimeo</string>
 
     <string name="video_title_key">Video Title</string>
+    <string name="video_thumbnail_key">Video Thumbnail</string>
     <string name="download_action">Download</string>
     <string name="cancel_action">Cancel</string>
 
