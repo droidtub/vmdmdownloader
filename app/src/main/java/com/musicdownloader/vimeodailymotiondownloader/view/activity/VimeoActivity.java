@@ -84,7 +84,7 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+                VimeoActivity.super.onBackPressed();
             }
         });
         //initBannerAds();
@@ -152,6 +152,15 @@ public class VimeoActivity extends BaseActivity implements VimeoView {
                 .positiveText(R.string.download_action)
                 .negativeText(R.string.cancel_action)
                 .show();
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(webView.canGoBack()){
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
     }
 
 }
