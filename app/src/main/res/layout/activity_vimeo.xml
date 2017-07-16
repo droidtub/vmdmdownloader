@@ -23,7 +23,11 @@
         android:layout_centerHorizontal="true">
     </FrameLayout>
 
-    <include layout="@layout/content_main"/>
+    <WebView
+        android:id="@+id/webView"
+        android:layout_below="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"

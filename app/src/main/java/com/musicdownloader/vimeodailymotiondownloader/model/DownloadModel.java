@@ -18,8 +18,11 @@ import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.musicdownloader.vimeodailymotiondownloader.R;
+import com.musicdownloader.vimeodailymotiondownloader.SearchApi;
+import com.musicdownloader.vimeodailymotiondownloader.VideoApplication;
 import com.musicdownloader.vimeodailymotiondownloader.entity.DownloadMission;
 import com.musicdownloader.vimeodailymotiondownloader.entity.DownloadMissionItem;
+import com.musicdownloader.vimeodailymotiondownloader.entity.SearchVideoEntity;
 import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntity;
 import com.musicdownloader.vimeodailymotiondownloader.entity.VideoEntityJson;
 
@@ -39,12 +42,15 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Retrofit;
 
 /**
  * Created by Hanh Nguyen on 7/10/2017.
  */
 
 public class DownloadModel {
+
+    private String fieldResponse = "title,thumbnail_url,owner,views_total";
 
     public static final int RESULT_SUCCEED = 1;
     public static final int RESULT_FAILED = -1;
@@ -63,6 +69,7 @@ public class DownloadModel {
     private static DatabaseModel databaseModel;
     private static DownloadModel instance;
     @Inject SharedPreferences sharedPreferences;
+    @Inject Retrofit retrofit;
 
     public static final DownloadModel getInstance(Context context){
         if(instance == null){
@@ -267,5 +274,12 @@ public class DownloadModel {
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    /**
+     * DM APIs
+     */
+    public Observable<SearchVideoEntity> searchVideos(final String query, final int page){
+        return retrofit.create(SearchApi.class).searchVideos(query, page, VideoApplication.VIDEO_PER_PAGE, fieldResponse);
     }
 }

@@ -13,6 +13,7 @@ import com.musicdownloader.vimeodailymotiondownloader.di.module.AppModule;
 public class VideoApplication extends Application {
 
     public static final String BASE_URL = "https://vimeo.com";
+    public static final int VIDEO_PER_PAGE = 10;
     private AppComponent appComponent;
 
     @Override

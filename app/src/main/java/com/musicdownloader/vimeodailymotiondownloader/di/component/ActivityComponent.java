@@ -2,6 +2,7 @@ package com.musicdownloader.vimeodailymotiondownloader.di.component;
 
 import com.musicdownloader.vimeodailymotiondownloader.di.PerActivity;
 import com.musicdownloader.vimeodailymotiondownloader.di.module.ActivityModule;
+import com.musicdownloader.vimeodailymotiondownloader.view.activity.DailyMotionActivity;
 import com.musicdownloader.vimeodailymotiondownloader.view.activity.MainActivity;
 import com.musicdownloader.vimeodailymotiondownloader.view.activity.SplashActivity;
 import com.musicdownloader.vimeodailymotiondownloader.view.activity.VimeoActivity;
@@ -22,4 +23,5 @@ public interface ActivityComponent {
     void inject(MainActivity mainActivity);
     void inject(VimeoActivity vimeoActivity);
     void inject(VimeoVideoActivity vimeoVideoActivity);
+    void inject(DailyMotionActivity dailyMotionActivity);
 }

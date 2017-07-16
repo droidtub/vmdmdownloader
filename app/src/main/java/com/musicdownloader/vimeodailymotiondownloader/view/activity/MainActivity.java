@@ -247,7 +247,8 @@ public class MainActivity extends BaseActivity implements MainView{
 
     @OnClick(R.id.dm_fab)
     public void startDailyMotionActivit(){
-        startActivity(new Intent(this, DailyMotionActivity.class));
+        //startActivity(new Intent(this, DailyMotionActivity.class));
+        Toast.makeText(this, "Coming soon!", Toast.LENGTH_SHORT).show();
     }
 
     DownloadManagerAdapter.OnItemClickListener OnDownloadItemClickListener = new DownloadManagerAdapter.OnItemClickListener(){
